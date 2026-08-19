@@ -19,7 +19,7 @@ from torch.utils.data import Subset, DataLoader, random_split
 from torchvision import datasets, transforms
 from torchvision.models.detection import transform
 
-from config import image_size, amount_of_flip, angle_range, mean, std
+from config import image_size, amount_of_flip, angle_range, mean, std, dataset_path, batch_size, num_workers
 
 
 class LoadDataset:
@@ -78,9 +78,35 @@ class LoadDataset:
             )
         ])
 
+    # following method will help me to load the images, better use static method
+    @staticmethod
+    def __load_images(self, _path, _transform):
+        # load the images
+        images = datasets.Images(
+            root = _path, # path is coming from user
+            transform = _transform, # transform is coming from user
+        )
+        return images # return the result
+
     # following method will help me to load the dataset, it will use other methods to return the result.
     def __private_dataset_loader(self):
         # image loader for train, validation and testing
+        train_images = self.__load_images(
+            _path = dataset_path, # path is coming from config
+            _transform = self.transform_for_train # transform source
+        )
+
+        # image loader for validation
+        validation_images = self.__load_images(
+            _path = dataset_path,  # path is coming from config
+            _transform = self.transform_for_validation_and_test # transform source
+        )
+
+        # image loader for testing
+        test_images = self.__load_images(
+            _path = dataset_path,  # path is coming from config
+            _transform = self.transform_for_validation_and_test # transform source
+        )
 
         # manual seed
 
