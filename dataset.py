@@ -77,3 +77,22 @@ class LoadDataset:
                 std=std,  # std is coming from config.py file
             )
         ])
+
+    # following method will help me to load the dataset, it will use other methods to return the result.
+    def __private_dataset_loader(self):
+        # image loader for train, validation and testing
+
+        # manual seed
+
+        # split the dataset according to their indices
+
+        # make a subset for train, validation and testing
+
+        # load the dataset with Data Loader
+
+        return True # temporary
+
+    # it will use private dataset loader to return the dataset, (encapsulation for safety).
+    def load_dataset(self):
+        result = self.__private_dataset_loader()
+        return result
