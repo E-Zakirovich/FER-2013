@@ -19,7 +19,7 @@ from torch.utils.data import Subset, DataLoader, random_split
 from torchvision import datasets, transforms
 from torchvision.models.detection import transform
 
-from config import image_size, amount_of_flip, angle_range, mean, std, dataset_path, batch_size, num_workers
+from config import image_size, amount_of_flip, angle_range, mean, std, dataset_path, batch_size, num_workers, train_split, validation_split, test_split
 
 
 class LoadDataset:
@@ -88,6 +88,17 @@ class LoadDataset:
         )
         return images # return the result
 
+    # following method will help you to make a subset
+    @staticmethod
+    def _make_subset(self, indices : list, data):
+        # subset parameters are coming from user
+        subset = Subset(
+            dataset = data, # path is coming from user
+            indices = indices.indices # indices are coming from user
+        )
+        return subset # return the result
+
+
     # following method will help me to load the dataset, it will use other methods to return the result.
     def __private_dataset_loader(self):
         # image loader for train, validation and testing
@@ -109,10 +120,39 @@ class LoadDataset:
         )
 
         # manual seed
+        manual_seed = torch.Generator().manual_seed(
+            seed = seed, # seed is coming from config.py
+        )
 
         # split the dataset according to their indices
+        train_indices, validation_indices, test_indices = random_split(
+            train_images,
+            [
+                train_split, # train split is coming form config.py file
+                validation_split, # validation split is coming form config.py file
+                test_split # test split is coming from config.py file
+            ],
+            generator = manual_seed # try to control random split (split randomly once and use it forever)
+        )
 
-        # make a subset for train, validation and testing
+        # make a subset for train
+        train_subset = self._make_subset(
+            train_images,
+            train_indices
+        )
+
+        # make a subset for validation
+        validation_subset = self._make_subset(
+            validation_images,
+            validation_indices
+
+        )
+
+        # make a subset for test
+        test_subset = self._make_subset(
+            test_images,
+            test_indices
+        )
 
         # load the dataset with Data Loader
 
