@@ -17,6 +17,8 @@ It will do following operations:
 import torch
 from torch.utils.data import Subset, DataLoader, random_split
 from torchvision import datasets, transforms
+from torchvision.models.detection import transform
+
 from config import image_size, amount_of_flip, angle_range, mean, std
 
 
@@ -55,4 +57,23 @@ class LoadDataset:
 
         ])
 
-        
+        # make a transform for validation and test
+        self.transform_for_validation_and_test = transform.Compose([
+            # resize the image size
+            transforms.Resize(
+                # images size coming from config.py file
+                (
+                    image_size,
+                    image_size,
+                )
+            ),
+
+            # make a tensor from images to fit the data to convolutional neural networks.
+            transforms.ToTensor(),
+
+            # normalization part
+            transforms.Normalize(
+                mean=mean,  # mean is coming from config.py file
+                std=std,  # std is coming from config.py file
+            )
+        ])
