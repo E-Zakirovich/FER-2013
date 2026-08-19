@@ -17,16 +17,16 @@ It will do following operations:
 import torch
 from torch.utils.data import Subset, DataLoader, random_split
 from torchvision import datasets, transforms
-from torchvision.models.detection import transform
+from torchvision.datasets import ImageFolder
 
-from config import image_size, amount_of_flip, angle_range, mean, std, dataset_path, batch_size, num_workers, train_split, validation_split, test_split
+from config import image_size, amount_of_flip, angle_range, mean, std, dataset_path, batch_size, num_workers, train_split, validation_split, test_split, seed
 
 
 class LoadDataset:
     def __init__(self):
 
         # make a transform for train data
-        self.transform_for_train = transform.Compose([
+        self.transform_for_train = transforms.Compose([
             # resize the image size
             transforms.Resize(
                 # images size coming from config.py file
@@ -43,7 +43,7 @@ class LoadDataset:
 
             # rotate the image between -angle_range : angle_range to avoid underfitting or overfitting
             transforms.RandomRotation(
-                p = angle_range # angle_range is coming from config.py file
+                degrees = angle_range # angle_range is coming from config.py file
             ),
 
             # make a tensor from images to fit the data to convolutional neural networks.
@@ -58,7 +58,7 @@ class LoadDataset:
         ])
 
         # make a transform for validation and test
-        self.transform_for_validation_and_test = transform.Compose([
+        self.transform_for_validation_and_test = transforms.Compose([
             # resize the image size
             transforms.Resize(
                 # images size coming from config.py file
@@ -80,9 +80,9 @@ class LoadDataset:
 
     # following method will help me to load the images, better use static method
     @staticmethod
-    def __load_images(self, _path, _transform):
+    def __load_images(_path, _transform):
         # load the images
-        images = datasets.Images(
+        images = datasets.ImageFolder(
             root = _path, # path is coming from user
             transform = _transform, # transform is coming from user
         )
@@ -90,13 +90,24 @@ class LoadDataset:
 
     # following method will help you to make a subset
     @staticmethod
-    def _make_subset(self, indices : list, data):
+    def _make_subset(data, indices):
         # subset parameters are coming from user
         subset = Subset(
             dataset = data, # path is coming from user
             indices = indices.indices # indices are coming from user
         )
         return subset # return the result
+
+    # following method will help you to load dataset
+    @staticmethod
+    def __data_loader(subset, shuffle):
+        result = DataLoader(
+            dataset = subset, # subset is coming form user
+            batch_size = batch_size, # batch size is coming from config.py
+            shuffle = shuffle, # shuffle is coming from user
+            num_workers = num_workers, # num workers coming from config.py
+        )
+        return result
 
 
     # following method will help me to load the dataset, it will use other methods to return the result.
@@ -121,7 +132,7 @@ class LoadDataset:
 
         # manual seed
         manual_seed = torch.Generator().manual_seed(
-            seed = seed, # seed is coming from config.py
+            seed, # seed is coming from config.py
         )
 
         # split the dataset according to their indices
@@ -154,9 +165,25 @@ class LoadDataset:
             test_indices
         )
 
-        # load the dataset with Data Loader
+        # load train dataset
+        train_dataset = self.__data_loader(
+            train_subset, # subset
+            shuffle = True # shuffle it for train(avoid underfitting or overfitting
+        )
 
-        return True # temporary
+        # load validation dataset
+        validation_dataset = self.__data_loader(
+            validation_subset, # subset
+            shuffle = False # shuffle does not need for validation
+        )
+
+        # load test dataset
+        test_dataset = self.__data_loader(
+            test_subset, # subset
+            shuffle = False # shuffle does not need for validation
+        )
+
+        return train_dataset, validation_dataset, test_dataset
 
     # it will use private dataset loader to return the dataset, (encapsulation for safety).
     def load_dataset(self):
