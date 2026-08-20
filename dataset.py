@@ -17,9 +17,7 @@ It will do following operations:
 import torch
 from torch.utils.data import Subset, DataLoader, random_split
 from torchvision import datasets, transforms
-from torchvision.datasets import ImageFolder
-
-from config import image_size, amount_of_flip, angle_range, mean, std, dataset_path, batch_size, num_workers, train_split, validation_split, test_split, seed
+from config import image_size, amount_of_flip, angle_range, mean, std, dataset_path, batch_size, num_workers, train_split, validation_split, test_split, seed, total_channels
 
 
 class LoadDataset:
@@ -27,6 +25,9 @@ class LoadDataset:
 
         # make a transform for train data
         self.transform_for_train = transforms.Compose([
+
+            transforms.Grayscale(num_output_channels = total_channels), # total number of channels of the image
+
             # resize the image size
             transforms.Resize(
                 # images size coming from config.py file
@@ -59,6 +60,9 @@ class LoadDataset:
 
         # make a transform for validation and test
         self.transform_for_validation_and_test = transforms.Compose([
+
+            transforms.Grayscale(num_output_channels = total_channels), # total number of channels of the image
+
             # resize the image size
             transforms.Resize(
                 # images size coming from config.py file
@@ -109,23 +113,23 @@ class LoadDataset:
         )
         return result
 
-
     # following method will help me to load the dataset, it will use other methods to return the result.
     def __private_dataset_loader(self):
+    
         # image loader for train, validation and testing
-        train_images = self.__load_images(
+        train_images = __load_images(
             _path = dataset_path, # path is coming from config
             _transform = self.transform_for_train # transform source
         )
 
         # image loader for validation
-        validation_images = self.__load_images(
+        validation_images = __load_images(
             _path = dataset_path,  # path is coming from config
             _transform = self.transform_for_validation_and_test # transform source
         )
 
         # image loader for testing
-        test_images = self.__load_images(
+        test_images = __load_images(
             _path = dataset_path,  # path is coming from config
             _transform = self.transform_for_validation_and_test # transform source
         )
@@ -147,38 +151,38 @@ class LoadDataset:
         )
 
         # make a subset for train
-        train_subset = self._make_subset(
+        train_subset = _make_subset(
             train_images,
             train_indices
         )
 
         # make a subset for validation
-        validation_subset = self._make_subset(
+        validation_subset = _make_subset(
             validation_images,
             validation_indices
 
         )
 
         # make a subset for test
-        test_subset = self._make_subset(
+        test_subset = _make_subset(
             test_images,
             test_indices
         )
 
         # load train dataset
-        train_dataset = self.__data_loader(
+        train_dataset = __data_loader(
             train_subset, # subset
             shuffle = True # shuffle it for train(avoid underfitting or overfitting
         )
 
         # load validation dataset
-        validation_dataset = self.__data_loader(
+        validation_dataset = __data_loader(
             validation_subset, # subset
             shuffle = False # shuffle does not need for validation
         )
 
         # load test dataset
-        test_dataset = self.__data_loader(
+        test_dataset = __data_loader(
             test_subset, # subset
             shuffle = False # shuffle does not need for validation
         )
