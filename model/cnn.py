@@ -11,7 +11,7 @@ import torch.nn as neuralnetwork
 from config import in_out_channels, kernel_size, stride, padding, kernel_and_stride_size_for_pooling, input_layer, hidden_layer, output_layer, dropout
 
 
-class CNN(neuralnetwork.NeuralNetwork):
+class CNN(neuralnetwork.Module):
     def __init__(self):
         super(CNN, self).__init__()
 
