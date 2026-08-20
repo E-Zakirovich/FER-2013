@@ -8,7 +8,7 @@ file.
 """
 
 import torcn.nn as neuralnetwork
-from config import in_out_channels, kernel_size, stride, padding, kernel_and_stride_size_for_pooling
+from config import in_out_channels, kernel_size, stride, padding, kernel_and_stride_size_for_pooling, input_layer, hidden_layer, output_layer, dropout
 
 
 class CNN(neuralnetwork.NeuralNetwork):
@@ -62,4 +62,22 @@ class CNN(neuralnetwork.NeuralNetwork):
             kernel_size = kernel_and_stride_size_for_pooling, # kernel size must be 2 in order to decrease the size of the image 3x
             stride = kernel_and_stride_size_for_pooling, # stride also must be 2 in order to decrease the size 2x times
         )
-        
+
+        # neural networks part
+
+        # connection between input layer and hidden layer
+        self.input_layer_and_hidden_layer_connection = neuralnetwork.Linear(
+            input_layer, # input layer, size is 6 * 6 * 128
+            hidden_layer, # hidden layer, size is 512 (my decision)
+        )
+
+        # dropout some weights in order to avoid underfitting or overfitting
+        self.dropout = neuralnetwork.Dropout(
+            p = dropout # amount, (I choose 30%, bcz it is not big net and dataset is also small)
+        )
+
+        # connection between hidden layer and output layer
+        self.hidden_layer_and_output_layer_connection = neuralnetwork.Linear(
+            hidden_layer, # hidden layer, size is 512 (my decision)
+            output_layer # output layer, total is 7 because 7 moods we got.
+        )
