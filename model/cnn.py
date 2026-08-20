@@ -8,7 +8,7 @@ file.
 """
 
 import torcn.nn as neuralnetwork
-from config import in_out_channels, kernel_size, stride, padding
+from config import in_out_channels, kernel_size, stride, padding, kernel_and_stride_size_for_pooling
 
 
 class CNN(neuralnetwork.NeuralNetwork):
@@ -43,13 +43,23 @@ class CNN(neuralnetwork.NeuralNetwork):
 
         # third convolutional layer
         self.third_convolutional_layer = nn.Conv2d(
-            in_channels=in_out_channels[2],  # in channels (64)
-            out_channels=in_out_channels[3],  # out channels (128)
-            kernel_size=kernel_size,  # the size of kernel which is 3
-            stride=stride,  # the size of stride which is 1, it is amount of movement of kernel
-            padding=padding,  # extra +1 size for top, down right and left
+            in_channels = in_out_channels[2],  # in channels (64)
+            out_channels = in_out_channels[3],  # out channels (128)
+            kernel_size = kernel_size,  # the size of kernel which is 3
+            stride = stride,  # the size of stride which is 1, it is amount of movement of kernel
+            padding = padding,  # extra +1 size for top, down right and left
         )
         # third batch normalization
         self.third_batch_normalization = nn.BatchNorm2d(
             in_out_channels[3]  # batch normalizer value which is 128 (help me to decreases number to make easy to train)
         )
+
+        # ReLU function
+        self.relu = neuralnetwork.ReLU()
+
+        # pooling
+        self.pool = neuralnetwork.MaxPool2D(
+            kernel_size = kernel_and_stride_size_for_pooling, # kernel size must be 2 in order to decrease the size of the image 3x
+            stride = kernel_and_stride_size_for_pooling, # stride also must be 2 in order to decrease the size 2x times
+        )
+        
