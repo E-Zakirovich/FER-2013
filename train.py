@@ -33,3 +33,21 @@ class Train:
             self.model.parameters(), # parameters of my model
             lr=learning_rate, # learning rate
         )
+
+    # following method will help me to train
+    def fit(self, epochs):
+        # loop for epoch
+
+            # train the model
+
+            # running, training loss and total corercts
+
+            # loop to see images & labels
+
+                # optmize zero grad
+                # get the output from model
+                # find loss function
+                # optimizer
+
+                # running loss, total corrects, total, corrects
+        ...
