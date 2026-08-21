@@ -25,3 +25,6 @@ input_layer = 6 * 6 * 128
 hidden_layer = 512
 output_layer = 7
 dropout = 0.3
+
+# train parameters
+learning_rate = 0.001
